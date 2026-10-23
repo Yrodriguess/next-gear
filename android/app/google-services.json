@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "85922583610",
+    "project_id": "nextgear-dev",
+    "storage_bucket": "nextgear-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85922583610:android:02c30709ab8f67e592d103",
+        "android_client_info": {
+          "package_name": "com.example.next_gear"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQHtjEBKeYENcYlAUqikvDUcYKThqjhvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isValidImage() {
+      return request.resource.size < 8 * 1024 * 1024
+             && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Documentos assinados (PDFs) ──────────────────────────
+    // Leitura aberta pra QUALQUER pessoa com o link — é assim que o
+    // vendedor manda o Termo pro lojista via WhatsApp, sem o lojista
+    // precisar de login no app. Escrita só por usuário autenticado
+    // (vendedor/admin criam via app), e só criação — nunca
+    // sobrescrever/apagar um documento já gerado.
+    match /documentos/{orgId}/{arquivo} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.size < 10 * 1024 * 1024
+                    && request.resource.contentType == 'application/pdf';
+      allow update, delete: if false;
+    }
+
+    // ── Fotos de qualquer entidade (produtos, clientes, expositores...) ──
+    // Um bloco só cobre organizations/{orgId}/{tipo}/{id}/{arquivo} pra
+    // qualquer {tipo} — em vez de repetir isso a cada novo lugar do
+    // app que ganhar uma foto (hoje é "products"; amanhã pode ser a
+    // fachada do cliente, o expositor, etc., sem precisar mexer aqui
+    // de novo). Leitura pública: o app carrega via Image.network, sem
+    // token de autenticação anexado. Escrita (create, update E
+    // delete, tudo coberto por "write") só por usuário autenticado, e
+    // só se for realmente uma imagem válida — a foto PRECISA poder
+    // ser substituída (é o "trocar a foto" dos formulários), sempre
+    // gravando no mesmo caminho.
+    match /organizations/{orgId}/{tipo}/{entidadeId}/{arquivo} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidImage();
+    }
+
+    // Qualquer outro caminho no Storage fica bloqueado por padrão.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

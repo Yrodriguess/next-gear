@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "nextgear-dev",
+          "appId": "1:85922583610:android:02c30709ab8f67e592d103",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nextgear-dev",
+          "configurations": {
+            "android": "1:85922583610:android:02c30709ab8f67e592d103",
+            "web": "1:85922583610:web:b83d36cfffac469192d103"
+          }
+        }
+      }
+    }
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

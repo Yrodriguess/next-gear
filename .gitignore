@@ -1,0 +1,161 @@
+
+# ============================================
+# NEXT GEAR
+# Flutter | Dart | Firebase | Android | Web
+# ============================================
+
+# ============================================
+# 1. ARQUIVOS TEMPORARIOS DO SISTEMA
+# ============================================
+
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history/
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ============================================
+# 2. ANDROID STUDIO / INTELLIJ / VS CODE
+# ============================================
+
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# ============================================
+# 3. FLUTTER / DART / PUB
+# ============================================
+
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+build/
+coverage/
+
+# ============================================
+# 4. ANDROID / GRADLE
+# ============================================
+
+.gradle/
+.kotlin/
+.cxx/
+
+**/local.properties
+
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# ============================================
+# 5. VARIAVEIS DE AMBIENTE
+# ============================================
+
+.env
+.env.*
+!.env.example
+
+*.env.local
+
+# ============================================
+# 6. CHAVES PRIVADAS E CERTIFICADOS
+# ============================================
+
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.p8
+*.pem
+*.key
+
+key.properties
+keystore.properties
+
+# ============================================
+# 7. CREDENCIAIS ADMINISTRATIVAS FIREBASE
+# ============================================
+
+serviceAccountKey.json
+*service-account*.json
+*service_account*.json
+*firebase-adminsdk*.json
+
+# Arquivos locais do Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+database-debug.log
+ui-debug.log
+
+# ============================================
+# 8. BANCOS DE DADOS LOCAIS
+# ============================================
+
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# ============================================
+# 9. ARQUIVOS COMPILADOS
+# ============================================
+
+*.apk
+*.aab
+*.ipa
+
+# Simbolos e mapas de ofuscacao
+app.*.symbols
+app.*.map.json
+
+# ============================================
+# 10. ARQUIVOS TEMPORARIOS NEXT GEAR
+# ============================================
+
+/flutter_*.png
+/estrutura-*.txt
+
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# ============================================
+# 11. CONFIGURACOES QUE DEVEM SER VERSIONADAS
+# ============================================
+
+# Manter apos revisao de seguranca:
+#
+# pubspec.yaml
+# pubspec.lock
+# analysis_options.yaml
+# README.md
+# firebase.json
+# .firebaserc
+# firebase_options.dart
+# google-services.json
+# storage.rules
+# firestore.rules
+#
+# Arquivos de configuracao cliente do Firebase
+# nao sao necessariamente segredos.
+# Validar as permissoes antes de publicar.
+
+# ============================================
+# FIM - NEXT GEAR
+# ============================================
