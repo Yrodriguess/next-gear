@@ -1,88 +1,174 @@
-s# NEXT GEAR — Setup no Android Studio
+# Next Gear
 
-Passo a passo pra colocar o projeto rodando do zero. Faça na ordem.
+**Sistema de gestão de consignação, expositores, estoque e operações comerciais.**
 
-## 1. Instalar o Flutter SDK
+**Tecnologias:** Flutter · Dart · Firebase · Riverpod  
+**Plataformas do projeto:** Android e Web  
+**Status:** em desenvolvimento — não homologado para produção
 
-1. Baixe o Flutter em https://docs.flutter.dev/get-started/install/windows (ou macOS/Linux, conforme o seu sistema).
-2. Extraia numa pasta sem espaço no caminho, ex: `C:\dev\flutter`.
-3. Adicione `C:\dev\flutter\bin` na variável de ambiente `PATH`.
-4. Abra um terminal novo e rode:
-   ```
-   flutter doctor
-   ```
-   Resolva qualquer item marcado com `[x]` (geralmente falta aceitar as licenças do Android SDK: `flutter doctor --android-licenses`).
+## Visão geral
 
-## 2. Configurar o Android Studio
+O **Next Gear** é uma aplicação em desenvolvimento para apoiar operações de **venda consignada**. A proposta é acompanhar produtos e expositores desde o cadastro e a instalação no ponto de venda até as visitas de conferência, reposição, emissão de documentos e acompanhamento financeiro.
 
-1. Abra o Android Studio → **Plugins** → instale **Flutter** (o plugin **Dart** vem junto automaticamente).
-2. Reinicie o Android Studio.
-3. Em **More Actions / Get from VCS** ou **New Flutter Project**, confirme que o SDK do Flutter aparece configurado (Settings → Languages & Frameworks → Flutter → aponte pro caminho onde você extraiu o SDK).
+O projeto foi estruturado para reunir atividades comerciais e operacionais em uma única aplicação, com módulos separados por responsabilidade e interfaces para Android e Web.
 
-## 3. Criar o projeto
+> **Nota de transparência:** os módulos relacionados abaixo possuem arquivos no repositório. A presença desses arquivos não significa que todos os fluxos estejam concluídos, testados ou prontos para uso em produção.
 
-Se você ainda não criou o projeto:
-```
-flutter create --platforms=android,web next_gear
-```
-Isso já cria suportando Android e Web (sem precisar de Mac — iOS pode ser adicionado depois com `flutter create --platforms=ios .`, quando tiver Mac/CI disponível).
+## Problema que o projeto busca resolver
 
-Depois, **substitua/adicione** os arquivos que já vieram prontos aqui (`pubspec.yaml`, `lib/main.dart`, `lib/core/theme/app_theme.dart` e as pastas em `lib/features/`) dentro do projeto que o `flutter create` gerou.
+Uma operação de consignação pode exigir controles paralelos de estoque, localização de expositores, visitas a clientes, mercadorias movimentadas e valores a receber. O Next Gear procura organizar essas informações e reduzir a dependência de registros dispersos.
 
-Abra a pasta no Android Studio: **File → Open** → selecione a pasta `next_gear`.
+O fluxo de negócio modelado pelo projeto envolve:
 
-## 4. Conectar o Firebase
+1. Cadastro de clientes, produtos e SKUs.
+2. Cadastro e acompanhamento de modelos e unidades físicas de expositores.
+3. Movimentação de estoque e instalação em pontos de venda.
+4. Visitas de conferência, reposição ou retirada.
+5. Registro de resultados, documentos e assinaturas.
+6. Acompanhamento financeiro e relatórios operacionais.
 
-1. Crie o projeto no [console do Firebase](https://console.firebase.google.com) — comece pelo ambiente de desenvolvimento: `nextgear-dev` (ver seção 15.1 do Blueprint — dev/hml/prod separados desde o início).
-2. Ative no console: **Authentication**, **Firestore Database**, **Storage**, **Functions** (exige plano Blaze), **App Check**.
-3. Instale a CLI do Firebase e o FlutterFire:
-   ```
-   npm install -g firebase-tools
-   firebase login
-   dart pub global activate flutterfire_cli
-   ```
-4. Na pasta do projeto Flutter, rode:
-   ```
-   flutterfire configure --project=nextgear-dev
-   ```
-   Isso gera automaticamente o arquivo `lib/firebase_options.dart` e configura Android/Web. Depois, no `lib/main.dart`, descomente as duas linhas que referenciam `firebase_options.dart` e `DefaultFirebaseOptions.currentPlatform`.
+## Módulos encontrados no código
 
-## 5. Buscar as dependências e rodar
+| Módulo | Responsabilidades representadas no repositório |
+| --- | --- |
+| **Autenticação e usuários** | Login, perfis de usuários e controle de acesso na aplicação. |
+| **Clientes** | Cadastro, consulta, edição e dados operacionais de clientes. |
+| **Produtos** | Produtos, categorias, SKUs, códigos e imagens. |
+| **Estoque** | Saldos, entradas, transferências e movimentações. |
+| **Expositores** | Modelos, unidades físicas, status e movimentações. |
+| **Consignações** | Entidades e repositórios para operações de consignação. |
+| **Visitas** | Instalação, execução, conferência, retirada e resultados. |
+| **Financeiro** | Contas a receber, pagamentos e acertos de caixa. |
+| **Documentos** | Geração de PDFs e coleta de assinatura. |
+| **Relatórios** | Visões de vendas, giro, aging, visitas e expositores. |
 
-```
-flutter pub get
-flutter run -d chrome        # roda a versão Web
-flutter run                  # roda no emulador/dispositivo Android conectado
-```
-Se a tela abrir mostrando **"NEXTGEAR"** com o gradiente verde-teal no centro, o setup está correto — Firebase inicializado, tema aplicado, projeto buildando nas duas plataformas.
+## Tecnologias e organização
 
-## 6. Estrutura de pastas — organizada por módulo do Blueprint
+- **Flutter e Dart:** base das interfaces e da lógica do aplicativo.
+- **Riverpod:** gerenciamento de estado utilizado no projeto.
+- **Firebase Authentication:** autenticação de usuários.
+- **Cloud Firestore:** persistência de dados da aplicação.
+- **Cloud Storage:** armazenamento de arquivos e imagens.
+- **Android e Web:** plataformas presentes na estrutura do projeto.
 
-```
+A organização do código é **orientada a funcionalidades (feature-first)**. Os módulos podem conter camadas `data/`, `domain/` e `presentation/`, conforme suas necessidades.
+
+```text
 lib/
-  core/
-    theme/          → AppColors e AppTheme (seção 17 do Blueprint)
-    constants/       → constantes gerais (nomes de coleção, enums compartilhados)
-  features/
-    auth/            → login, permissões (seção 4)
-    clientes/        → cadastro, aprovação, limite/exposição (seção 5)
-    produtos/         → produto/SKU, tabela de preço (seção 6.3, 6.6)
-    expositores/      → template + unidade física com QR Code (seção 7.1)
-    estoque/           → stockMovements, inventoryBalances, carga do vendedor (seção 6)
-    consignacoes/      → entidade `consignments`, ciclo fecha/reabre (seção 7.2, 7.3)
-    visitas/           → máquina de estados da visita, conferência (seção 7.4-7.6)
-    financeiro/        → ledger, contas a receber, aprovações (seção 8)
-    relatorios/        → aging, giro, mapa de expositores, dashboards (seção 9)
+├── core/
+│   ├── constants/
+│   ├── navigation/
+│   ├── providers/
+│   ├── shell/
+│   ├── theme/
+│   ├── utils/
+│   └── widgets/
+├── features/
+│   ├── auth/
+│   ├── clientes/
+│   ├── consignacoes/
+│   ├── estoque/
+│   ├── expositores/
+│   ├── financeiro/
+│   │   └── documentos/
+│   ├── produtos/
+│   ├── relatorios/
+│   └── visitas/
+├── firebase_options.dart
+└── main.dart
 ```
-Cada pasta de `features/` deve crescer com a própria subestrutura (`data/`, `domain/`, `presentation/` ou o padrão que a equipe preferir) conforme o módulo for sendo implementado — não precisa criar tudo isso agora, só ir preenchendo à medida que cada módulo é programado.
 
-## 7. Por onde começar a programar
+Essa separação busca facilitar manutenção, evolução dos fluxos e testes. A qualidade das dependências entre camadas ainda está sujeita a revisão técnica.
 
-Sugestão de ordem, seguindo o roadmap do Blueprint (seção 14):
-1. **`core/`** — já vem pronto (tema). Adicionar aqui as constantes de nome de coleção do Firestore antes de mais nada.
-2. **`auth/`** — login + custom claims de perfil (admin/financeiro/vendedor/estoque).
-3. **`clientes/`** — cadastro com as 3 dimensões de status (seção 5.1) + regra de exposição/limite (seção 5.3).
-4. **`produtos/` e `expositores/`** — cadastro de SKU e do expositor físico com número `MODELO-SEQUENCIAL`.
-5. **`consignacoes/` + `visitas/`** — o coração do sistema: ciclo de consignação que fecha e reabre (seção 7.2).
+## Executar em ambiente de desenvolvimento
 
-O schema completo do Firestore (campo a campo, por coleção) é o próximo documento útil pra ter em mãos antes de começar o módulo 3 — se quiser, é só pedir.
+### Pré-requisitos
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) instalado e configurado.
+- Android Studio com plugins Flutter/Dart, ou outra IDE compatível.
+- Um emulador/dispositivo Android ou navegador Chrome para executar o app.
+- Acesso a um projeto Firebase **de desenvolvimento/testes**, com os serviços necessários habilitados.
+
+### 1. Obter o projeto
+
+> O repositório pode estar privado. Nesse caso, o comando exige uma conta com permissão de acesso.
+
+```bash
+git clone https://github.com/Yrodriguess/next-gear.git
+cd next-gear
+```
+
+### 2. Validar o ambiente e instalar dependências
+
+```bash
+flutter doctor
+flutter pub get
+flutter devices
+```
+
+### 3. Verificar a configuração do Firebase
+
+O repositório contém configuração gerada pelo FlutterFire (`lib/firebase_options.dart` e, no Android, `android/app/google-services.json`). Ela identifica um projeto Firebase, **mas não concede permissão de acesso aos dados**.
+
+Para utilizar um projeto Firebase próprio e isolado, configure-o com o [FlutterFire CLI](https://firebase.google.com/docs/flutter/setup) e revise as integrações necessárias. **Não utilize dados reais de clientes nem credenciais administrativas em ambientes de teste.**
+
+### 4. Executar
+
+Para Web:
+
+```bash
+flutter run -d chrome
+```
+
+Para Android, consulte o ID de um dispositivo com `flutter devices` e utilize:
+
+```bash
+flutter run -d <id-do-dispositivo>
+```
+
+> A execução bem-sucedida depende das permissões, serviços e regras efetivamente configurados no Firebase do ambiente. Este guia não garante que todos os módulos estejam operacionais.
+
+## Verificações de qualidade
+
+Com o Flutter configurado, as verificações locais recomendadas são:
+
+```bash
+flutter analyze
+flutter test
+```
+
+**Situação atual:** o repositório contém `test/widget_test.dart`, mas a cobertura de testes e os resultados desses comandos ainda não foram documentados ou homologados neste README.
+
+## Segurança e privacidade
+
+O Next Gear manipula informações de clientes, operações financeiras e documentos. Por isso, a segurança é parte do desenvolvimento, não apenas da publicação do código.
+
+- Não incluir senhas, tokens privados, contas de serviço, chaves de assinatura ou dados reais em commits.
+- Manter regras de acesso do Firestore e Storage revisadas e testadas para cada perfil e organização.
+- Utilizar dados fictícios e projetos Firebase isolados durante testes.
+- Validar permissões no backend/regras do Firebase; controles somente na interface não são suficientes.
+- Não considerar o sistema pronto para produção enquanto a revisão de autorização e os testes de segurança estiverem pendentes.
+
+**Pendência conhecida:** as regras de autorização e o isolamento entre organizações estão em revisão. A configuração presente no repositório pode não refletir todas as regras atualmente implantadas no Firebase.
+
+## Próximas melhorias
+
+- [ ] Revisar e testar as regras do Firestore e do Storage.
+- [ ] Adicionar testes unitários, de widgets e de regras de segurança.
+- [ ] Documentar os fluxos de negócio mais importantes.
+- [ ] Adicionar capturas reais das versões Web e Android.
+- [ ] Automatizar análises e testes com CI.
+- [ ] Revisar tratamento de erros, permissões e organização dos módulos.
+- [ ] Preparar configuração e assinatura próprias para uma futura distribuição Android.
+
+## Demonstração
+
+Capturas de tela e um vídeo demonstrativo serão adicionados após seleção das telas e remoção de quaisquer dados reais. Enquanto isso, este README descreve o escopo técnico presente no repositório, sem simular imagens ou resultados ainda não validados.
+
+## Autor
+
+**Ytalo Rodrigues** — [GitHub: @Yrodriguess](https://github.com/Yrodriguess)
+
+## Licenciamento
+
+O projeto não possui, neste momento, uma licença de código aberto publicada. Consulte o autor antes de reutilizar ou distribuir o código.
