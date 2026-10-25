@@ -1,45 +1,79 @@
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
+
     function isSignedIn() {
       return request.auth != null;
     }
+
     function isValidImage() {
-      return request.resource.size < 8 * 1024 * 1024
+      return request.resource != null
+             && request.resource.size < 8 * 1024 * 1024
              && request.resource.contentType.matches('image/.*');
     }
 
-    // ── Documentos assinados (PDFs) ──────────────────────────
-    // Leitura aberta pra QUALQUER pessoa com o link — é assim que o
-    // vendedor manda o Termo pro lojista via WhatsApp, sem o lojista
-    // precisar de login no app. Escrita só por usuário autenticado
-    // (vendedor/admin criam via app), e só criação — nunca
-    // sobrescrever/apagar um documento já gerado.
+    function isValidPdf() {
+      return request.resource != null
+             && request.resource.size < 10 * 1024 * 1024
+             && request.resource.contentType == 'application/pdf';
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // DOCUMENTOS ASSINADOS / TERMOS PDF
+    // ─────────────────────────────────────────────────────────
     match /documentos/{orgId}/{arquivo} {
       allow read: if true;
+
       allow create: if isSignedIn()
-                    && request.resource.size < 10 * 1024 * 1024
-                    && request.resource.contentType == 'application/pdf';
+                    && isValidPdf();
+
+      // Documento gerado não pode ser alterado ou apagado.
       allow update, delete: if false;
     }
 
-    // ── Fotos de qualquer entidade (produtos, clientes, expositores...) ──
-    // Um bloco só cobre organizations/{orgId}/{tipo}/{id}/{arquivo} pra
-    // qualquer {tipo} — em vez de repetir isso a cada novo lugar do
-    // app que ganhar uma foto (hoje é "products"; amanhã pode ser a
-    // fachada do cliente, o expositor, etc., sem precisar mexer aqui
-    // de novo). Leitura pública: o app carrega via Image.network, sem
-    // token de autenticação anexado. Escrita (create, update E
-    // delete, tudo coberto por "write") só por usuário autenticado, e
-    // só se for realmente uma imagem válida — a foto PRECISA poder
-    // ser substituída (é o "trocar a foto" dos formulários), sempre
-    // gravando no mesmo caminho.
+
+    // ─────────────────────────────────────────────────────────
+    // PADRÃO NOVO DE FOTOS
+    //
+    // organizations/{orgId}/{tipo}/{entidadeId}/{arquivo}
+    //
+    // Exemplos:
+    // organizations/next-gear/products/ABC/foto.jpg
+    // organizations/next-gear/clientes/XYZ/fachada.jpg
+    // organizations/next-gear/expositores/EXP001/foto.jpg
+    // ─────────────────────────────────────────────────────────
     match /organizations/{orgId}/{tipo}/{entidadeId}/{arquivo} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidImage();
+
+      allow create, update: if isSignedIn()
+                            && isValidImage();
+
+      allow delete: if isSignedIn();
     }
 
-    // Qualquer outro caminho no Storage fica bloqueado por padrão.
+
+    // ─────────────────────────────────────────────────────────
+    // CLIENTES - CAMINHO ATUAL DO APP
+    //
+    // Hoje o Flutter está gravando:
+    // clientes/{orgId}/{clienteId}/{arquivo}
+    //
+    // Mantemos essa regra para não quebrar o cadastro atual.
+    // ─────────────────────────────────────────────────────────
+    match /clientes/{orgId}/{clienteId}/{arquivo} {
+      allow read: if true;
+
+      allow create, update: if isSignedIn()
+                            && isValidImage();
+
+      allow delete: if isSignedIn();
+    }
+
+
+    // ─────────────────────────────────────────────────────────
+    // BLOQUEIO PADRÃO
+    // ─────────────────────────────────────────────────────────
     match /{allPaths=**} {
       allow read, write: if false;
     }
