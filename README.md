@@ -1,5 +1,7 @@
 # Next Gear
 
+[![CI](https://github.com/Yrodriguess/next-gear/actions/workflows/ci.yml/badge.svg)](https://github.com/Yrodriguess/next-gear/actions/workflows/ci.yml)
+
 **Sistema de gestão de consignação, expositores, estoque e operações comerciais.**
 
 **Tecnologias:** Flutter · Dart · Firebase · Riverpod  
@@ -130,14 +132,27 @@ flutter run -d <id-do-dispositivo>
 
 ## Verificações de qualidade
 
-Com o Flutter configurado, as verificações locais recomendadas são:
+As mesmas verificações rodam localmente e no CI:
 
 ```bash
-flutter analyze
+flutter analyze --no-fatal-infos
 flutter test
 ```
 
-**Situação atual:** o repositório contém `test/widget_test.dart`, mas a cobertura de testes e os resultados desses comandos ainda não foram documentados ou homologados neste README.
+O workflow [`ci.yml`](.github/workflows/ci.yml) executa esses comandos no GitHub Actions a cada push na `main` e em todo Pull Request.
+
+**Situação atual:**
+
+- `flutter analyze`: sem erros e sem warnings. Os avisos restantes são do tipo `info` e serão tratados em PRs menores.
+- `flutter test`: testes unitários para os cálculos e validações abaixo.
+
+| Arquivo | O que é verificado |
+| --- | --- |
+| `test/core/formatadores_test.dart` | GTIN (EAN-13, EAN-8 e UPC-A), valores em centavos, CPF/CNPJ e telefone. |
+| `test/features/consignacoes/domain/consignment_item_test.dart` | Comissão do cliente, líquido da Next Gear e arredondamento. |
+| `test/features/visitas/domain/conferencia_item_test.dart` | Conferência da visita: falta, sobra e classificação das diferenças. |
+
+Um teste está marcado como pendente de propósito: o suporte ao CNPJ alfanumérico.
 
 ## Segurança e privacidade
 
@@ -154,10 +169,11 @@ O Next Gear manipula informações de clientes, operações financeiras e docume
 ## Próximas melhorias
 
 - [ ] Revisar e testar as regras do Firestore e do Storage.
-- [ ] Adicionar testes unitários, de widgets e de regras de segurança.
+- [x] Adicionar os primeiros testes unitários (formatadores, comissão e conferência).
+- [ ] Ampliar os testes para widgets e regras de segurança.
 - [ ] Documentar os fluxos de negócio mais importantes.
 - [ ] Adicionar capturas reais das versões Web e Android.
-- [ ] Automatizar análises e testes com CI.
+- [x] Automatizar análises e testes com CI.
 - [ ] Revisar tratamento de erros, permissões e organização dos módulos.
 - [ ] Preparar configuração e assinatura próprias para uma futura distribuição Android.
 
