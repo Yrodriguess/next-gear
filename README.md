@@ -164,11 +164,14 @@ O Next Gear manipula informações de clientes, operações financeiras e docume
 - Validar permissões no backend/regras do Firebase; controles somente na interface não são suficientes.
 - Não considerar o sistema pronto para produção enquanto a revisão de autorização e os testes de segurança estiverem pendentes.
 
-**Pendência conhecida:** as regras de autorização e o isolamento entre organizações estão em revisão. A configuração presente no repositório pode não refletir todas as regras atualmente implantadas no Firebase.
+**Regras de acesso:** as regras do Firestore e do Storage ficam versionadas neste repositório (`firestore.rules` e `storage.rules`) e são as mesmas publicadas no Firebase. Ler ou gravar dados e arquivos exige um cadastro ativo da equipe em `usuarios`. Os links com token, como o enviado ao cliente pelo WhatsApp, continuam abrindo sem login.
+
+**Pendência conhecida:** o isolamento entre organizações e as permissões de cada papel ainda estão em revisão.
 
 ## Próximas melhorias
 
-- [ ] Revisar e testar as regras do Firestore e do Storage.
+- [x] Versionar as regras do Firestore e do Storage e exigir cadastro ativo da equipe.
+- [ ] Isolar organizações e refinar as permissões de cada papel nas regras.
 - [x] Adicionar os primeiros testes unitários (formatadores, comissão e conferência).
 - [ ] Ampliar os testes para widgets e regras de segurança.
 - [ ] Documentar os fluxos de negócio mais importantes.

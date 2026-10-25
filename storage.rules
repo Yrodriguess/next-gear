@@ -20,16 +20,34 @@ service firebase.storage {
     }
 
     // ─────────────────────────────────────────────────────────
+    // MEMBRO ATIVO DA EQUIPE
+    //
+    // Mesma regra do firestore.rules: estar logado não basta.
+    // Enviar, apagar ou ler um arquivo pelo caminho exige cadastro
+    // em "usuarios" no Firestore, ativo e com papel da equipe.
+    // ─────────────────────────────────────────────────────────
+    function meuUsuario() {
+      return firestore.get(/databases/(default)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function ehMembroAtivo() {
+      return isSignedIn()
+        && firestore.exists(/databases/(default)/documents/usuarios/$(request.auth.uid))
+        && meuUsuario().get('ativo', true) == true
+        && meuUsuario().get('role', '') in ['admin', 'financeiro', 'vendedor', 'estoque'];
+    }
+
+    // ─────────────────────────────────────────────────────────
     // LEITURA: "read" é a soma de duas permissões.
     //
     // get  = ler UM arquivo pelo caminho exato. O app usa isso para
-    //        pegar o link da foto ou do PDF logo depois de enviar.
-    // list = listar a pasta inteira. Fica bloqueado: o app não usa,
-    //        e liberado permitia a qualquer pessoa ver todos os
-    //        arquivos da organização.
+    //        pegar o link da foto ou do PDF logo depois de enviar,
+    //        então basta liberar para a equipe ativa.
+    // list = listar a pasta inteira. Fica bloqueado: o app não usa.
     //
-    // O link que o lojista recebe pelo WhatsApp tem um token próprio
-    // e abre o arquivo sem passar por estas regras.
+    // O link que o lojista recebe pelo WhatsApp e os links das fotos
+    // têm um token próprio e abrem o arquivo sem passar por estas
+    // regras. Por isso continuam funcionando sem login.
     // ─────────────────────────────────────────────────────────
 
 
@@ -37,10 +55,10 @@ service firebase.storage {
     // DOCUMENTOS ASSINADOS / TERMOS PDF
     // ─────────────────────────────────────────────────────────
     match /documentos/{orgId}/{arquivo} {
-      allow get: if true;
+      allow get: if ehMembroAtivo();
       allow list: if false;
 
-      allow create: if isSignedIn()
+      allow create: if ehMembroAtivo()
                     && isValidPdf();
 
       // Documento gerado não pode ser alterado ou apagado.
@@ -59,13 +77,13 @@ service firebase.storage {
     // organizations/next-gear/expositores/EXP001/foto.jpg
     // ─────────────────────────────────────────────────────────
     match /organizations/{orgId}/{tipo}/{entidadeId}/{arquivo} {
-      allow get: if true;
+      allow get: if ehMembroAtivo();
       allow list: if false;
 
-      allow create, update: if isSignedIn()
+      allow create, update: if ehMembroAtivo()
                             && isValidImage();
 
-      allow delete: if isSignedIn();
+      allow delete: if ehMembroAtivo();
     }
 
 
@@ -78,13 +96,13 @@ service firebase.storage {
     // Mantemos essa regra para não quebrar o cadastro atual.
     // ─────────────────────────────────────────────────────────
     match /clientes/{orgId}/{clienteId}/{arquivo} {
-      allow get: if true;
+      allow get: if ehMembroAtivo();
       allow list: if false;
 
-      allow create, update: if isSignedIn()
+      allow create, update: if ehMembroAtivo()
                             && isValidImage();
 
-      allow delete: if isSignedIn();
+      allow delete: if ehMembroAtivo();
     }
 
 
