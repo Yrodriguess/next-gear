@@ -455,17 +455,6 @@ class SkuDetailPage extends ConsumerWidget {
       ),
     );
   }
-
-  static String _statusLabel(
-      SkuStatus status,
-      ) =>
-      switch (status) {
-        SkuStatus.active => 'Ativo',
-        SkuStatus.blockedForSale =>
-        'Bloqueado para venda',
-        SkuStatus.discontinued =>
-        'Descontinuado',
-      };
 }
 
 class _CabecalhoDesktop extends StatelessWidget {
@@ -1337,13 +1326,11 @@ class _LinhaInfo extends StatelessWidget {
     required this.label,
     required this.valor,
     this.copiavel = false,
-    this.trailing,
   });
 
   final String label;
   final String valor;
   final bool copiavel;
-  final Widget? trailing;
 
   Future<void> _copiar(
       BuildContext context,
@@ -1416,13 +1403,6 @@ class _LinhaInfo extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (trailing !=
-                        null) ...[
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      trailing!,
-                    ],
                     if (copiavel)
                       IconButton(
                         tooltip: 'Copiar',
@@ -1467,10 +1447,6 @@ class _LinhaInfo extends StatelessWidget {
                   ),
                 ),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: 10),
-                trailing!,
-              ],
               if (copiavel)
                 IconButton(
                   tooltip: 'Copiar',

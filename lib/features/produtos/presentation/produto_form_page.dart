@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -2782,12 +2781,10 @@ class _TextoInformativo
     extends StatelessWidget {
   final IconData icon;
   final String texto;
-  final Color? cor;
 
   const _TextoInformativo({
     required this.icon,
     required this.texto,
-    this.cor,
   });
 
   @override
@@ -2798,7 +2795,6 @@ class _TextoInformativo
     Theme.of(context);
 
     final corFinal =
-        cor ??
             theme
                 .colorScheme
                 .onSurfaceVariant;

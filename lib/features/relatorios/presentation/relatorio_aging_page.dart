@@ -8,7 +8,6 @@ import '../../../core/constants/firestore_collections.dart';
 import '../../auth/presentation/usuario_providers.dart';
 import '../../clientes/presentation/cliente_detail_page.dart';
 import '../../clientes/presentation/cliente_providers.dart';
-import '../../consignacoes/domain/consignment.dart';
 import '../../consignacoes/presentation/consignment_providers.dart';
 import '../../estoque/domain/estoque_saldo.dart';
 import '../../estoque/domain/stock_movement.dart';

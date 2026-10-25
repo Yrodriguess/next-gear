@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# O GitHub Actions só precisa ler o código.
+permissions:
+  contents: read
+
+jobs:
+  analisar-e-testar:
+    name: Análise e testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      # Mesma versão do Flutter usada no desenvolvimento.
+      # Ao atualizar o Flutter na máquina, atualize aqui também.
+      - name: Instalar o Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: beta
+          flutter-version: '3.45.0-0.1.pre'
+          cache: true
+
+      - name: Instalar dependências
+        run: flutter pub get
+
+      # Infos aparecem no log; só warnings e erros reprovam.
+      - name: Análise estática
+        run: flutter analyze --no-fatal-infos
+
+      - name: Testes
+        run: flutter test

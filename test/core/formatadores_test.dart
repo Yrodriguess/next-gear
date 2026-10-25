@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:next_gear/core/utils/br_formatters.dart';
 import 'package:next_gear/core/utils/gtin_validator.dart';

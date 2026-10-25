@@ -4059,58 +4059,6 @@ class _FiltroChip extends StatelessWidget {
   }
 }
 
-class _ConsignacaoOption extends StatelessWidget {
-  final Consignment consignacao;
-  final ExpositorFisico? expositor;
-  final VoidCallback onTap;
-
-  const _ConsignacaoOption({
-    required this.consignacao,
-    required this.expositor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final titulo = expositor?.numero ?? 'Consignação ${consignacao.numero}';
-
-    return Card(
-      margin: EdgeInsets.zero,
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: colorScheme.outlineVariant),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
-        leading: CircleAvatar(
-          backgroundColor: colorScheme.secondaryContainer,
-          foregroundColor: colorScheme.onSecondaryContainer,
-          child: const Icon(Icons.view_in_ar_outlined),
-        ),
-        title: Text(
-          titulo,
-          style: const TextStyle(fontWeight: FontWeight.w700),
-        ),
-        subtitle: Text(
-          [
-            if (expositor?.modeloNome.isNotEmpty == true)
-              expositor!.modeloNome,
-            '${consignacao.itens.length} produto(s)',
-          ].join(' • '),
-        ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
-    );
-  }
-}
-
 class _WarningCard extends StatelessWidget {
   final IconData icon;
   final String title;

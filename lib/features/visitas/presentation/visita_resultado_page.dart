@@ -101,12 +101,6 @@ class _VisitaResultadoPageState
             (total, item) => total + item.quantidade,
       );
 
-  int get _totalVendidas =>
-      widget.resultado.itensCicloEncerrado.fold<int>(
-        0,
-            (total, item) => total + item.quantidadeVendida,
-      );
-
   String _formaLabel(_FormaPagamento forma) {
     return switch (forma) {
       _FormaPagamento.dinheiro => 'Dinheiro',
@@ -511,7 +505,7 @@ class _VisitaResultadoPageState
         preparacao == null
             ? 'Não foi possível preparar o documento. '
             'Tente novamente.'
-            : 'Falha ao gerar ${preparacao!.numero}. '
+            : 'Falha ao gerar ${preparacao.numero}. '
             'A assinatura foi preservada; tente novamente.';
       });
     } finally {
