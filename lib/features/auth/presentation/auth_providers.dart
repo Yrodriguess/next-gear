@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/firestore_collections.dart';
 import '../data/auth_repository.dart';
 import '../data/usuario_repository.dart';
 import '../domain/app_user.dart';
