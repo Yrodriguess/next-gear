@@ -455,17 +455,6 @@ class SkuDetailPage extends ConsumerWidget {
       ),
     );
   }
-
-  static String _statusLabel(
-      SkuStatus status,
-      ) =>
-      switch (status) {
-        SkuStatus.active => 'Ativo',
-        SkuStatus.blockedForSale =>
-        'Bloqueado para venda',
-        SkuStatus.discontinued =>
-        'Descontinuado',
-      };
 }
 
 class _CabecalhoDesktop extends StatelessWidget {
