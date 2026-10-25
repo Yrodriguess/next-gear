@@ -7,20 +7,42 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function meuUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // MEMBRO ATIVO DA EQUIPE
+    //
+    // Estar logado não basta: qualquer pessoa consegue criar uma conta
+    // no Firebase Auth sem passar pelo app. Por isso, ler ou gravar
+    // dados exige um cadastro em "usuarios" (que só um admin cria),
+    // não bloqueado e com um papel da equipe.
+    //
+    // Cadastros antigos sem o campo "ativo" contam como ativos,
+    // igual ao app.
+    // ─────────────────────────────────────────────────────────
+    function ehMembroAtivo() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
+        && meuUsuario().get('ativo', true) == true
+        && meuUsuario().get('role', '') in ['admin', 'financeiro', 'vendedor', 'estoque'];
+    }
+
     function meuPapel() {
-      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role;
+      return meuUsuario().role;
     }
 
     function meuOrgId() {
-      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.orgId;
+      return meuUsuario().orgId;
     }
 
     function temPapel(papel) {
-      return isSignedIn() && meuPapel() == papel;
+      return ehMembroAtivo() && meuPapel() == papel;
     }
 
     function temAlgumPapel(papeis) {
-      return isSignedIn() && meuPapel() in papeis;
+      return ehMembroAtivo() && meuPapel() in papeis;
     }
 
     function ehAdmin() {
@@ -60,7 +82,7 @@ service cloud.firestore {
     }
 
     match /clientes/{clienteId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['vendedor', 'admin'])
                     && request.resource.data.orgId == meuOrgId();
       allow update: if request.resource.data.orgId == resource.data.orgId
@@ -77,7 +99,7 @@ service cloud.firestore {
     }
 
     match /clienteCpfCnpjControle/{controleId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['vendedor', 'admin'])
                     && request.resource.data.orgId == meuOrgId();
       allow update: if temAlgumPapel(['vendedor', 'admin'])
@@ -89,7 +111,7 @@ service cloud.firestore {
     }
 
     match /auditLogs/{logId} {
-      allow read: if isSignedIn() && resource.data.orgId == meuOrgId();
+      allow read: if ehMembroAtivo() && resource.data.orgId == meuOrgId();
       allow create: if temAlgumPapel(['admin', 'financeiro', 'vendedor'])
                     && request.resource.data.orgId == meuOrgId()
                     && request.resource.data.usuarioId == request.auth.uid;
@@ -97,70 +119,70 @@ service cloud.firestore {
     }
 
     match /produtos/{produtoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque']);
       allow delete: if false;
     }
 
     match /categoriasProduto/{categoriaId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque']);
       allow delete: if false;
     }
 
     match /skus/{skuId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque']);
       allow delete: if false;
     }
 
     match /skuPrecos/{precoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'estoque']);
       allow update, delete: if false;
     }
 
     match /skuBarcodes/{barcodeId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'estoque']);
       allow update: if false;
       allow delete: if temAlgumPapel(['admin', 'estoque']);
     }
 
     match /expositorModelos/{modeloId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque']);
       allow delete: if false;
     }
 
     match /expositoresFisicos/{expositorId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque', 'vendedor', 'financeiro']);
       allow delete: if false;
     }
 
     match /expositorMovimentacoes/{movId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'estoque', 'vendedor', 'financeiro']);
       allow update, delete: if false;
     }
 
     match /estoqueMovimentacoes/{movId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'estoque', 'vendedor'])
                     && request.resource.data.orgId == meuOrgId();
       allow update, delete: if false;
     }
 
     match /estoqueSaldos/{saldoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'estoque', 'vendedor'])
                              && request.resource.data.orgId == meuOrgId();
       allow delete: if false;
     }
 
     match /consignments/{consignmentId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'vendedor']);
       allow update: if temAlgumPapel(['admin', 'vendedor'])
                     && resource.data.status == 'ativa';
@@ -168,33 +190,33 @@ service cloud.firestore {
     }
 
     match /visitas/{visitaId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'vendedor']);
       allow delete: if false;
     }
 
     match /contasAReceber/{recebivelId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create, update: if temAlgumPapel(['admin', 'financeiro', 'vendedor']);
       allow delete: if false;
     }
 
     match /payments/{pagamentoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'financeiro', 'vendedor']);
       allow update: if temAlgumPapel(['admin', 'financeiro', 'vendedor']);
       allow delete: if false;
     }
 
     match /acertosCaixa/{acertoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
       allow create: if temAlgumPapel(['admin', 'financeiro', 'vendedor']);
       allow update: if temAlgumPapel(['admin', 'financeiro']);
       allow delete: if false;
     }
 
     match /documentosGerados/{documentoId} {
-      allow read: if isSignedIn();
+      allow read: if ehMembroAtivo();
 
       // Criação normal:
       // - "gerando" = reserva persistente da Etapa 3;
@@ -239,8 +261,11 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Contadores que numeram consignações, visitas, recebíveis e
+    // documentos. O app só cria e incrementa; nunca apaga.
     match /counters/{counterId} {
-      allow read, write: if isSignedIn();
+      allow read, create, update: if ehMembroAtivo();
+      allow delete: if false;
     }
   }
 }
