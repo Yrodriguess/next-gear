@@ -20,10 +20,25 @@ service firebase.storage {
     }
 
     // ─────────────────────────────────────────────────────────
+    // LEITURA: "read" é a soma de duas permissões.
+    //
+    // get  = ler UM arquivo pelo caminho exato. O app usa isso para
+    //        pegar o link da foto ou do PDF logo depois de enviar.
+    // list = listar a pasta inteira. Fica bloqueado: o app não usa,
+    //        e liberado permitia a qualquer pessoa ver todos os
+    //        arquivos da organização.
+    //
+    // O link que o lojista recebe pelo WhatsApp tem um token próprio
+    // e abre o arquivo sem passar por estas regras.
+    // ─────────────────────────────────────────────────────────
+
+
+    // ─────────────────────────────────────────────────────────
     // DOCUMENTOS ASSINADOS / TERMOS PDF
     // ─────────────────────────────────────────────────────────
     match /documentos/{orgId}/{arquivo} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if false;
 
       allow create: if isSignedIn()
                     && isValidPdf();
@@ -44,7 +59,8 @@ service firebase.storage {
     // organizations/next-gear/expositores/EXP001/foto.jpg
     // ─────────────────────────────────────────────────────────
     match /organizations/{orgId}/{tipo}/{entidadeId}/{arquivo} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if false;
 
       allow create, update: if isSignedIn()
                             && isValidImage();
@@ -62,7 +78,8 @@ service firebase.storage {
     // Mantemos essa regra para não quebrar o cadastro atual.
     // ─────────────────────────────────────────────────────────
     match /clientes/{orgId}/{clienteId}/{arquivo} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if false;
 
       allow create, update: if isSignedIn()
                             && isValidImage();
