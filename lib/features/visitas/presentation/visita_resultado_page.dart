@@ -511,7 +511,7 @@ class _VisitaResultadoPageState
         preparacao == null
             ? 'Não foi possível preparar o documento. '
             'Tente novamente.'
-            : 'Falha ao gerar ${preparacao!.numero}. '
+            : 'Falha ao gerar ${preparacao.numero}. '
             'A assinatura foi preservada; tente novamente.';
       });
     } finally {
