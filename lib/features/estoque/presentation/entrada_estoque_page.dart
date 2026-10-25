@@ -673,12 +673,11 @@ class _ItemEntradaSelecionado {
   final Sku sku;
   final Produto? produto;
   final TextEditingController custoController;
-  int quantidade;
+  int quantidade = 1;
 
   _ItemEntradaSelecionado({
     required this.sku,
     required this.produto,
-    this.quantidade = 1,
   }) : custoController = TextEditingController();
 
   String get descricao {
